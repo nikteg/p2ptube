@@ -68,7 +68,12 @@ class App extends React.Component<Readonly<Props>, State> {
             >
               Host
             </button>
-            <button onClick={() => store.set("roomId")((document.getElementById("roomId") as HTMLInputElement).value)}>
+            <button
+              onClick={() => {
+                store.set("isHosting")(false)
+                store.set("roomId")((document.getElementById("roomId") as HTMLInputElement).value)
+              }}
+            >
               Join
             </button>
           </div>
