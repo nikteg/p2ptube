@@ -1,0 +1,33 @@
+{
+  "name": "p2ptube",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@typed/compose": "^1.0.0",
+    "freeice": "^2.2.2",
+    "netflux": "^4.3.0",
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2",
+    "react-scripts-ts": "2.17.0",
+    "react-youtube": "^7.6.0",
+    "rxjs": "^6.2.2",
+    "undux": "^5.0.0-alpha.10"
+  },
+  "scripts": {
+    "start": "react-scripts-ts start",
+    "build": "react-scripts-ts build",
+    "test": "react-scripts-ts test --env=jsdom",
+    "eject": "react-scripts-ts eject"
+  },
+  "devDependencies": {
+    "@types/jest": "^23.3.1",
+    "@types/node": "^10.9.2",
+    "@types/react": "^16.4.12",
+    "@types/react-dom": "^16.0.7",
+    "@types/react-youtube": "^7.4.2",
+    "@types/youtube": "^0.0.33",
+    "prettier": "^1.14.2",
+    "protobufjs": "^6.8.8",
+    "typescript": "^3.0.1"
+  }
+}
