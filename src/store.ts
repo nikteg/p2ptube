@@ -1,7 +1,6 @@
 import { compose } from "@typed/compose"
 import { WebGroup, WebGroupState } from "netflux"
-import { createConnectedStore, Effects, Store, withReduxDevtools } from "undux"
-
+import { createConnectedStore, Effects, Store, withLogger } from "undux"
 let wg: WebGroup | null = null
 
 export type MessageType = "videoId" | "videoState" | "videoTime"
@@ -11,25 +10,34 @@ const serialize = (type: MessageType, payload: object) => JSON.stringify({ type,
 const effects: StoreEffects = (store) => {
   store.on("roomId").subscribe((roomId) => {
     if (roomId) {
+      history.pushState(null, undefined, location.origin + "?room=" + roomId)
+
       if (wg) {
         wg.leave()
       }
 
       wg = new WebGroup()
 
-      wg.onMyId = store.set("myId")
+      wg.onMyId = (id: number) => {
+        store.set("myId")(id)
+        store.set("members")([id])
+      }
 
       wg.onMemberJoin = (id) => {
         store.set("members")(wg!.members.slice(0).sort())
         store.set("latestMember")(id)
 
+        store.set("chat")(store.get("chat").concat([{ author: id, text: "joined" }]))
+
         if (store.get("videoId") && store.get("isHosting")) {
           wg!.sendTo(id, serialize("videoId", { videoId: store.get("videoId")! }))
+          wg!.sendTo(id, serialize("videoState", { videoId: store.get("videoState")! }))
         }
       }
 
       wg.onMemberLeave = (id) => {
         store.set("members")(wg!.members.slice(0).sort())
+        store.set("chat")(store.get("chat").concat([{ author: id, text: "left" }]))
       }
 
       wg.onMessage = (id, data) => {
@@ -51,15 +59,32 @@ const effects: StoreEffects = (store) => {
 
       wg.onStateChange = (state) => {
         store.set("connectionState")(state)
+
+        // If you were the first in the group, you're the host
+        // TODO: This is kinda buggy atm
+        if (state === WebGroupState.JOINED && wg!.members.length === 1) {
+          store.set("isHosting")(true)
+        }
       }
 
       wg.join(roomId)
+    } else {
+      store.set("isHosting")(false)
+      store.set("members")([])
+      store.set("latestMember")(null)
+      store.set("videoTime")(0)
+      store.set("chat")([])
+      store.set("videoId")(null)
+      store.set("videoState")("paused")
+
+      history.replaceState(null, undefined, location.origin)
     }
   })
 
   store.on("videoId").subscribe((videoId) => {
     if (wg && videoId && store.get("isHosting")) {
       wg.send(serialize("videoId", { videoId }))
+      store.set("chat")(store.get("chat").concat([{ author: store.get("myId")!, text: "Loaded video " + videoId }]))
     }
   })
 
@@ -75,7 +100,18 @@ const effects: StoreEffects = (store) => {
     }
   })
 
+  const url = new URL(location.href)
+
+  if (url.searchParams.has("room")) {
+    store.set("roomId")(url.searchParams.get("room"))
+  }
+
   return store
+}
+
+type ChatEntry = {
+  author: number
+  text: string
 }
 
 // Declare your store's types.
@@ -89,6 +125,7 @@ type State = {
   videoId: string | null
   videoState: "paused" | "playing"
   videoTime: number
+  chat: ChatEntry[]
 }
 
 // Declare your store's initial state.
@@ -102,6 +139,7 @@ const initialState: State = {
   videoId: null,
   videoState: "paused",
   videoTime: 0,
+  chat: [],
 }
 
 // Create & export a store with an initial value.
@@ -109,7 +147,7 @@ export default createConnectedStore(
   initialState,
   compose(
     effects,
-    withReduxDevtools,
+    withLogger,
   ),
 )
 

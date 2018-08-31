@@ -1,45 +1,159 @@
-.App {
-  text-align: center;
+* {
+  box-sizing: border-box;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+.App {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  font: 14px/1.5em sans-serif;
+}
+
+.App-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
+  background-color: #f2f2f2;
+  display: flex;
+  padding: 10px;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.App-header input {
+  flex: 1;
 }
 
 .App-title {
+  flex: 1;
   font-size: 1.5em;
+  font-weight: bold;
 }
 
-.App-intro {
-  font-size: large;
+.App-title a {
+  text-decoration: none;
+  color: inherit;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.App-video-name {
+  flex: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.me {
-  color: red;
+.App-video-name .title {
+  font-weight: bold;
+  margin-right: 5px;
 }
 
-input {
-  padding: 3px;
-  margin: 6px 3px 6px 6px;
+.App-video-name .badges span {
+  background: #e10050;
+  padding: 3px 6px;
+  font-size: 11px;
+  color: white;
+  margin-left: 3px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.App-video-name .badges span.hosting {
+  background: #e1d200;
+}
+
+.App-video-input {
+  flex: 1;
+  display: flex;
+  height: 40px;
+  padding: 4px 0;
+}
+
+.App-video {
+  flex: 1;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.App-video span {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.App-video iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.App-sidebar {
+  width: 320px;
+  background: #f2f2f2;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.App-roominfo {
+  display: flex;
+  height: 40px;
+  padding: 4px 0;
+}
+
+.App-roominfo input {
+  flex: 1;
+}
+
+.seperator {
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+  height: 26px;
+  margin: 2px 0 2px 9px;
+}
+
+.App-chat {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.App-chat-content {
+  flex: 1;
 }
 
 button {
-  padding: 3px;
+  font: 12px/1rem sans-serif;
+  padding: 5px 10px;
+  margin-left: 10px;
+  border-radius: 2px;
+  border: 0;
+  background: #2196f3;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #48a9f8;
+}
+
+button:disabled {
+  background: #777777;
+}
+
+input {
+  font: 13px/1rem sans-serif;
+  padding: 5px 10px;
+  border-radius: 2px;
+  border: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }

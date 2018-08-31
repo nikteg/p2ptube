@@ -1,11 +1,11 @@
 import * as React from "react"
 import YouTube from "react-youtube"
 import "./App.css"
-import logo from "./logo.svg"
 import store, { StoreProps } from "./store"
 
 type State = {
   playerInstance: YT.Player | null
+  roomIdValue: string
 }
 
 type Props = StoreProps
@@ -13,6 +13,7 @@ type Props = StoreProps
 class App extends React.Component<Readonly<Props>, State> {
   state: State = {
     playerInstance: null,
+    roomIdValue: "",
   }
 
   componentDidMount() {
@@ -32,62 +33,52 @@ class App extends React.Component<Readonly<Props>, State> {
     const { store } = this.props
 
     const roomId = store.get("roomId") || ""
-
     const videoId = store.get("videoId")
-
     const isHosting = store.get("isHosting")
+
+    // TODO: This probably re-renders this component every frame-ish
+    //@ts-ignore
+    const title = this.state.playerInstance ? this.state.playerInstance.getVideoData().title : "No video loaded"
 
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Synced YouTube</h1>
-        </header>
-        <div className="App-intro">
-          <div>
-            {store.get("roomId") && (
-              <h1>
-                Currently {isHosting ? "hosting" : "joined"} room {roomId}
-              </h1>
-            )}
-            {!store.get("roomId") && <h1>Please host or join room</h1>}
-            {store.get("members").length > 0 && <h1>Party members</h1>}
-            {store.get("members").map((id) => (
-              <div key={id} className={store.get("myId") === id ? "me" : ""}>
-                {id}
+        <div className="App-content">
+          <header className="App-header">
+            <div className="App-title">
+              <a href="./">Synced YouTube</a>
+            </div>
+            <div className="App-video-name">
+              <div className="title">{title}</div>
+              <div className="badges">
+                {isHosting && <span className="hosting">Hosting</span>}
+                {Boolean(store.get("roomId")) && <span className="people">{store.get("members").length} viewers</span>}
               </div>
-            ))}
-          </div>
-          <div>
-            <input type="text" id="roomId" defaultValue={roomId} placeholder="Room ID" />
-            <button
-              onClick={() => {
-                store.set("isHosting")(true)
-                store.set("roomId")(String(Date.now()))
-              }}
-            >
-              Host
-            </button>
-            <button
-              onClick={() => {
-                store.set("isHosting")(false)
-                store.set("roomId")((document.getElementById("roomId") as HTMLInputElement).value)
-              }}
-            >
-              Join
-            </button>
-          </div>
-          <div>
-            <input type="text" id="videoId" defaultValue={videoId || ""} placeholder="Wro0VE6i-XM" />
-            <button
-              onClick={() => store.set("videoId")((document.getElementById("videoId") as HTMLInputElement).value)}
-            >
-              Load youtube video
-            </button>
-          </div>
-          <div>
-            {videoId && (
+            </div>
+            <div className="App-video-input">
+              {Boolean(store.get("roomId")) && (
+                <>
+                  <input
+                    type="text"
+                    id="videoId"
+                    readOnly={!isHosting}
+                    defaultValue="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                  />
+                  <button
+                    disabled={!isHosting}
+                    onClick={() =>
+                      store.set("videoId")(getVideoID((document.getElementById("videoId") as HTMLInputElement).value))
+                    }
+                  >
+                    Play
+                  </button>
+                </>
+              )}
+            </div>
+          </header>
+          <div className="App-video">
+            {videoId ? (
               <YouTube
+                opts={{ playerVars: { autoplay: 1 } }}
                 videoId={videoId}
                 onPlay={() => store.set("videoState")("playing")}
                 onPause={() => store.set("videoState")("paused")}
@@ -98,11 +89,72 @@ class App extends React.Component<Readonly<Props>, State> {
                   }
                 }}
               />
+            ) : (
+              <div>Video goes here</div>
             )}
+          </div>
+        </div>
+        <div className="App-sidebar">
+          <div className="App-roominfo">
+            <input
+              type="text"
+              id="roomId"
+              readOnly={Boolean(store.get("roomId"))}
+              value={store.get("roomId") ? roomId : this.state.roomIdValue}
+              placeholder="Room ID"
+              onChange={({ target }) => this.setState({ roomIdValue: target.value })}
+            />
+            {!store.get("roomId") && (
+              <>
+                <button
+                  onClick={() => {
+                    store.set("isHosting")(false)
+                    store.set("roomId")(this.state.roomIdValue)
+                  }}
+                >
+                  Join
+                </button>
+                <div className="seperator" />
+                <button
+                  onClick={() => {
+                    store.set("isHosting")(true)
+                    store.set("roomId")(String(Date.now()))
+                  }}
+                >
+                  Host
+                </button>
+              </>
+            )}
+            {store.get("roomId") && <button onClick={() => store.set("roomId")(null)}>Leave</button>}
+          </div>
+          <div className="App-chat">
+            <div className="App-chat-content">
+              {store.get("chat").map((entry, i) => (
+                <div key={i}>
+                  {entry.author}: {entry.text}
+                </div>
+              ))}
+            </div>
+            {/* <input type="text" placeholder="Enter message..." /> */}
           </div>
         </div>
       </div>
     )
+  }
+}
+
+function getVideoID(input: string) {
+  try {
+    const url = new URL(input)
+
+    if (url.searchParams.has("v")) {
+      return url.searchParams.get("v")
+    }
+
+    return null
+  } catch {
+    // Input was not an URL, assume it was a video ID
+    return input
   }
 }
 
