@@ -1,6 +1,7 @@
 import { compose } from "@typed/compose"
 import { WebGroup, WebGroupState } from "netflux"
 import { createConnectedStore, Effects, Store, withLogger } from "undux"
+
 let wg: WebGroup | null = null
 
 export type MessageType = "videoId" | "videoState" | "videoTime"

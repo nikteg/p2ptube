@@ -1,6 +1,8 @@
+import "./App.css"
+
 import * as React from "react"
 import YouTube from "react-youtube"
-import "./App.css"
+
 import store, { StoreProps } from "./store"
 
 type State = {

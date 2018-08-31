@@ -4,7 +4,6 @@
   "private": true,
   "dependencies": {
     "@typed/compose": "^1.0.0",
-    "freeice": "^2.2.2",
     "netflux": "^4.3.0",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",

@@ -1,8 +1,7 @@
 {
   "editor.formatOnSave": true,
   "editor.formatOnSaveTimeout": 2000,
-  "editor.codeActionsOnSave": {
-    "source.organizeImports": true
-  },
-  "editor.codeActionsOnSaveTimeout": 2000
+  "typescriptHero.imports.insertSemicolons": false,
+  "typescriptHero.imports.organizeOnSave": true,
+  "typescriptHero.imports.stringQuoteStyle": "\""
 }
