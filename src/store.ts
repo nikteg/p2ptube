@@ -10,7 +10,7 @@ const serialize = (type: MessageType, payload: object) => JSON.stringify({ type,
 const effects: StoreEffects = (store) => {
   store.on("roomId").subscribe((roomId) => {
     if (roomId) {
-      history.pushState(null, undefined, location.origin + "?room=" + roomId)
+      history.pushState(null, undefined, location.origin + location.pathname + "?room=" + roomId)
 
       if (wg) {
         wg.leave()
@@ -77,7 +77,7 @@ const effects: StoreEffects = (store) => {
       store.set("videoId")(null)
       store.set("videoState")("paused")
 
-      history.replaceState(null, undefined, location.origin)
+      history.replaceState(null, undefined, location.origin + location.pathname)
     }
   })
 
