@@ -2,8 +2,11 @@ import "./App.css"
 
 import * as React from "react"
 import YouTube from "react-youtube"
+import * as shortid from "shortid"
 
 import store, { StoreProps } from "./store"
+
+shortid.characters("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_")
 
 type State = {
   playerInstance: YT.Player | null
@@ -20,8 +23,9 @@ class App extends React.Component<Readonly<Props>, State> {
 
   componentDidMount() {
     this.props.store.on("videoState").subscribe((videoState) => {
-      if (videoState === "paused") this.state.playerInstance!.pauseVideo()
-      if (videoState === "playing") this.state.playerInstance!.playVideo()
+      if (!this.state.playerInstance) return
+      if (videoState === "paused") this.state.playerInstance.pauseVideo()
+      if (videoState === "playing") this.state.playerInstance.playVideo()
     })
 
     this.props.store.on("videoTime").subscribe((videoTime) => {
@@ -92,7 +96,18 @@ class App extends React.Component<Readonly<Props>, State> {
                 }}
               />
             ) : (
-              <div>Video goes here</div>
+              !store.get("roomId") && (
+                <div>
+                  <button
+                    onClick={() => {
+                      store.set("isHosting")(true)
+                      store.set("roomId")(shortid.generate())
+                    }}
+                  >
+                    Host room
+                  </button>
+                </div>
+              )
             )}
           </div>
         </div>
@@ -107,27 +122,16 @@ class App extends React.Component<Readonly<Props>, State> {
               onChange={({ target }) => this.setState({ roomIdValue: target.value })}
             />
             {!store.get("roomId") && (
-              <>
-                <button
-                  onClick={() => {
-                    store.set("isHosting")(false)
-                    store.set("roomId")(this.state.roomIdValue)
-                  }}
-                >
-                  Join
-                </button>
-                <div className="seperator" />
-                <button
-                  onClick={() => {
-                    store.set("isHosting")(true)
-                    store.set("roomId")(String(Date.now()))
-                  }}
-                >
-                  Host
-                </button>
-              </>
+              <button
+                onClick={() => {
+                  store.set("isHosting")(false)
+                  store.set("roomId")(this.state.roomIdValue)
+                }}
+              >
+                Join room
+              </button>
             )}
-            {store.get("roomId") && <button onClick={() => store.set("roomId")(null)}>Leave</button>}
+            {store.get("roomId") && <button onClick={() => store.set("roomId")(null)}>Leave room</button>}
           </div>
           <div className="App-chat">
             <div className="App-chat-content">
